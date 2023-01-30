@@ -13,7 +13,7 @@ const TinderCardItem = dynamic(() => import("./TinderCardItem"),{ssr:false});
 
 
 const style = {
-    wrapper: `h-[45rem] w-[27rem] flex flex-col rounded-lg overflow-hidden`,
+    wrapper: ` md:h-[45rem] md:w-[27rem] flex flex-col rounded-lg overflow-hidden usm:w-[21rem] usm:h-[35rem]`,
     cardMain: `w-full flex-1 relative flex flex-col justify-center items-center bg-gray-500`,
     noMoreWrapper: `flex flex-col justify-center items-center absolute`,
     tinderLogo: `text-5xl text-red-500 mb-4`,
@@ -27,7 +27,6 @@ const Card = () => {
       let users_data = users.filter((data) => (data.wallet_address !== userData.wallet_address ) )
   return ( 
     <div className={style.wrapper}>
-      {console.log("this is the userData",userData.wallet_address)}
     <CardHeader />
     <div className={style.cardMain}>
       <div className={style.noMoreWrapper}>

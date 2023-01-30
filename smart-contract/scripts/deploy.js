@@ -12,6 +12,8 @@ async function main() {
   const tinderFactory = await hre.ethers.getContractFactory('TinderERC721')
   const TinderContract = await tinderFactory.deploy();
 
+  await TinderContract.deployed();
+
   console.log("Tinder contract address",TinderContract.address)
 
 }

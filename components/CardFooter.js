@@ -19,8 +19,8 @@ const CardFooter = () => {
         alt='fire-logo'
         className={style.logo}
       />
-      <FaSearch className={style.icon} />
-      <GiDiamonds className={style.icon} />
+      {/* <FaSearch className={style.icon} />
+      <GiDiamonds className={style.icon} /> */}
       <TiMessages className={style.icon} />
     </div>
   )

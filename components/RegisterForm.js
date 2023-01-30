@@ -22,7 +22,7 @@ function RegisterForm(props) {
   };
 
   return (
-    <div class="w-5/12  bg-white flex flex-col items-center justify-center  py-8 rounded-3xl 2xl:w-4/12  xl:w-5/12   lg:w-7/12">
+    <div class="w-7/12 bg-white flex flex-col items-center justify-center  py-8 rounded-3xl 2xl:w-4/12  xl:w-6/12 lg:w-7/12  usm:w-11/12 usm:p-12 ">
       <Form
         name="dinder_registration"
         labelCol={{}}
@@ -34,13 +34,9 @@ function RegisterForm(props) {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
-        <h1 className="font-bold text-3xl relative mb-10 right-9 ">Create Account</h1>
+        <h1 className="font-bold md:text-3xl md:left-0 md:p-0 relative mb-10 right-9 usm:text-base usm:left-10  ">Create Account</h1>
         <div
-        className="mb-5"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-          }}
+        className="flex  md:flex-row usm:flex-col "
         >
           <Form.Item
             label="Name"
@@ -58,9 +54,7 @@ function RegisterForm(props) {
           <Form.Item
             label="Email"
             name="email"
-            style={{
-              marginLeft: 15,
-            }}
+            className=" md:ml-5 usm:ml-0"
             rules={[
               {
                 required: true,

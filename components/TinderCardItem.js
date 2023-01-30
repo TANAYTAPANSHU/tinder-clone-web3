@@ -5,16 +5,19 @@ import { AiOutlineClose } from "react-icons/ai";
 import { AiFillStar } from "react-icons/ai";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 import TinderCard from "react-tinder-card";
+import abi from "../utils/TinderERC721.json";
+import { ethers } from "ethers";
+import { Alert } from "antd";
 
 const style = {
-  tinderCardWrapper: `w-full h-full absolute`,
-  wrapper: `w-full h-full overflow-hidden bg-no-repeat bg-cover bg-center relative px-8 py-4`,
+  tinderCardWrapper: `w-full h-full absolute bg-yellow-700`,
+  wrapper: `w-full h-full overflow-hidden bg-no-repeat bg-cover bg-center relative px-8 py-4 `,
   space: `flex justify-between h-3/4 items-end mb-6`,
   name: `flex text-white text-3xl font-extrabold items-center -mb-4`,
   age: `ml-4 font-semibold text-xl`,
   walletAddress: `font-bolder text-xl text-white mb-2`,
   reactionsContainer: `flex justify-between w-full px-2 gap-5`,
-  buttonContainer: `h-16 w-16 rounded-full flex items-center justify-center cursor-pointer border-2`,
+  buttonContainer: `rounded-full flex items-center justify-center cursor-pointer border-2 md:h-16 md:w-16   usm:h-11 usm:w-11` ,
   buttonSymbol: `text-3xl`,
   backColors: `border-white text-white`,
   xColors: `border-red-500 text-red-500`,
@@ -24,8 +27,7 @@ const style = {
 
 const TinderCardItem = ({ card }) => {
   const [address, setAddress] = useState();
-
-
+  const { userData } = useContext(TinderContext);
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -40,55 +42,72 @@ const TinderCardItem = ({ card }) => {
     }
   }, []);
 
-  const onSwipe = (dir) => {
-    if (dir === "right") {
-      handleRightSwipe(card, address);
+  //function is used to mint a nft
+  const mintNFT = async (cardData, currentUserAddress) => {
+    console.log("THi sis the card data , cirasd")
+    let contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    const contractABI = abi.abi;
+
+    if (ethereum && currentUserAddress) {
+      //injected metamask object, we are making the connection to the blockchain
+      const provider = new ethers.providers.Web3Provider(ethereum, "any");
+
+      //We are getting the ablity to sign the contract
+      const signer = provider.getSigner();
+      const dinderContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      let metadata = {
+        name: `tanay & tapanshu`,
+        description: `just matched!`,
+        image: `https://ipfs.filebase.io/ipfs/QmVof9goPgwgVHzJPMWdnh5AL2VV269AsRJHSG1cRLSc4r`,
+      };
+
+      metadata = JSON.stringify(metadata);
+      const dinderTxn = await dinderContract.minNFT(
+        cardData.wallet_address,
+        currentUserAddress,
+        metadata
+      );
+
+      await dinderTxn.wait();
+
+      Alert("mined ", dinderTxn.hash);
     }
   };
 
+  //function to handle the right swipe
   const handleRightSwipe = async (cardData, currentUserAddress) => {
-    const likeData = {
-      likedUser: cardData.walletAddress,
-      currentUser: currentUserAddress,
-    };
-
-    try {
-      await fetch("/api/saveLike", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(likeData),
-      });
-
-      const response = await fetch("/api/checkMatches", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(likeData),
-      });
-
-      const responseData = await response.json();
-
-      const matchStatus = responseData.data.isMatch;
-
-      if (matchStatus) {
-        const mintData = {
-          walletAddresses: [cardData.walletAddress, currentUserAddress],
-          names: [cardData.name, currentUser.name],
-        };
-
-        await fetch("/api/mintMatchNft", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(mintData),
-        });
+    console.log("this is the card data",cardData);
+    console.log("this is the user data" , userData)
+    //post the like data in the dinder_users_like table
+   let createLike = {
+      "user_id": userData?.id,
+      "like_id":cardData?.id
       }
-    } catch (error) {
-      console.error(error);
+      
+      fetch("http://localhost:3300/users/likes", {
+        method: "POST",
+        body: JSON.stringify(createLike),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then(() => {
+          mintNFT(cardData,currentUserAddress)
+        })
+        .catch((error) => console.error("Error:", error));
+  
+
+
+  };
+
+  const onSwipe = (dir) => {
+    if (dir === "right") {
+      handleRightSwipe(card, address);
     }
   };
 
@@ -100,8 +119,7 @@ const TinderCardItem = ({ card }) => {
     >
       <div
         className={style.wrapper}
-        style={{ backgroundImage: `url('${card.image_url
-        }')` }}
+        style={{ backgroundImage: `url('${card.image_url}')` }}
       >
         <div className={style.space}>
           <div className={style.name}>
@@ -129,11 +147,11 @@ const TinderCardItem = ({ card }) => {
               className={`${style.starColors} ${style.buttonSymbol}`}
             />
           </div>
-          <div className={`${style.lightningColors} ${style.buttonContainer}`}>
+          {/* <div className={`${style.lightningColors} ${style.buttonContainer}`}>
             <BsFillLightningChargeFill
               className={`${style.lightningColors} ${style.buttonSymbol}`}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </TinderCard>
